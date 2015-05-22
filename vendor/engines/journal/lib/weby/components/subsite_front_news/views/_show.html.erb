@@ -1,11 +1,10 @@
 <% quant = component.quant || 5 %>
         
-<% @subsite_front_news = Journal::NewsSite.from_subsites(current_site).order('updated_at desc')
+<% @subsite_front_news = Journal::News.from_subsites(current_site).order('updated_at desc')
                   .available_fronts.limit(quant) #page(params[:subsite_front_pages]).per(quant) %>
 
 <section class="subsite_front_news_component">
-    <% @subsite_front_news.each do |news_site| %>
-    <% news = news_site.news %>
+    <% @subsite_front_news.each do |news| %>
     <li style="list-style-type:none;">
     <article>
       <span class="news_origin origin"><%= t(".news_from") %> <%= link_to news.site.title, site_url(subdomain: news.site) %></span>

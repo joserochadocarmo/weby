@@ -2,13 +2,13 @@
 //= require init/tinymce
 
 $(document).ready(function(){
-   $('.input-category').select2({
+   $('#news_category_list').select2({
        width: 'resolve',
        tokenSeparators: [","],
-       tags: $('.input-category').data('tags'),
+       tags: $('#news_category_list').data('tags'),
        createSearchChoice: function(term){
          var eq = false
-         $($('.input-category').select2('val')).each(function(){
+         $($('#news_category_list').select2('val')).each(function(){
           //Case insensitive tagging
           if(this.toUpperCase().replace(/^\s+|\s+$/g,"") == term.toUpperCase().replace(/^\s+|\s+$/g,""))
             eq = true

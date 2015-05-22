@@ -178,6 +178,7 @@ ActiveRecord::Schema.define(version: 20150224174414) do
   add_index "journal_news_i18ns", ["journal_news_id"], name: "index_journal_news_i18ns_on_journal_news_id", using: :btree
   add_index "journal_news_i18ns", ["locale_id"], name: "index_journal_news_i18ns_on_locale_id", using: :btree
 
+<<<<<<< HEAD
   create_table "journal_news_sites", force: true do |t|
     t.integer  "journal_news_id",                 null: false
     t.integer  "site_id",                         null: false

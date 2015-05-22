@@ -466,18 +466,29 @@ module ApplicationHelper
         field: field
       )
       if test_permission (options[:controller] || controller_name), action
-         checkbox = check_box_tag(field, resource[field], resource[field], check_box_options)
+        checkbox = check_box_tag(field, resource[field], resource[field], check_box_options)
         html << link_to(checkbox, url_options, link_options)
       else
         check_box_options = check_box_options.merge(disabled: true)
-         html << check_box_tag(field, resource[field], resource[field], check_box_options)
+        html << check_box_tag(field, resource[field], resource[field], check_box_options)
       end
     end
   end
 
-  # Input: Site object  
+  # Input: Site object
   # Output: link to the favicon
   def favicon(site)
     site.favicon.nil? ? asset_url('favicon.ico') : main_app.site_url(subdomain: site) + site.favicon.archive.url
   end
+
+
+  #Esse helper auxilia o javascript responsive-images.js
+  def verify_language(language)
+    if language == params[:current_locale].to_s
+      "onclick: adiciona_atributo_srcset()"
+
+    end
+
+  end
+
 end

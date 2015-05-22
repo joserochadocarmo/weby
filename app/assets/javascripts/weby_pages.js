@@ -4,6 +4,7 @@
 //= require tables
 //= require_self
 
+
 var WEBY = {};
 
 // Mostrar mensagem para erros, no retorno do ajax

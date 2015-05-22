@@ -5,21 +5,19 @@ class Repository < ActiveRecord::Base
 
   STYLES = {
     i: "95x70",
-    l: "190x140",
-    m: "400x300",
+    l: "300x300>", #celular
+    m: "600x600>", #tablet
+    b: "900x900", #desktop
     t: "160x160^",
     o: "original"
   }
 
   belongs_to :site
 
+  has_many :banners
   has_many :sites, foreign_key: 'top_banner_id', dependent: :nullify
   has_many :posts_repositories, dependent: :destroy
   has_many :posts, through: :posts_repositories
-  # Extensions relations
-  has_many :news, class_name: 'Journal::News', dependent: :nullify
-  has_many :banners, class_name: 'Sticker::Banner', dependent: :nullify
-  has_many :events, class_name: 'Calendar::Event', dependent: :nullify
 
   has_attached_file :archive,
     styles: STYLES,
@@ -30,9 +28,8 @@ class Repository < ActiveRecord::Base
       l: "-quality 90 -strip",
       m: "-quality 80 -strip",
       t: "-crop 160x160+0+0 +repage -quality 90 -strip",
-      o: "-quality 80 -strip"
-    },
-    processors: [:cropper]
+      o: "-quality 80 -strip",
+      processors: [:cropper] }
 
 
   validates :description, presence: true
@@ -123,6 +120,7 @@ class Repository < ActiveRecord::Base
     json[:medium_path] = self.archive.url(:m)
     json[:mini_path] = self.archive.url(:i)
     json[:thumb_path] = self.archive.url(:t)
+    json[:big_path] = self.archive.url(:b)
     json
   end
 
@@ -132,8 +130,9 @@ class Repository < ActiveRecord::Base
     attrs = attrs.dup
     attrs = attrs['repository'] if attrs.key? 'repository'
     id = attrs['id']
-    attrs.except!('id', 'created_at', 'updated_at', 'deleted_at', 'site_id', 'type', '@type')
-    repo = self.find_by(archive_file_name: attrs['archive_file_name'], site_id: options[:site_id]) || self.create!(attrs)
+    attrs.except!('id', 'created_at', 'updated_at', 'deleted_at', 'site_id', 'type')
+
+    repo = self.create!(attrs)
     if repo.persisted?
       Import::Application::CONVAR["repository"]["#{id}"] ||= "#{repo.id}"
     end

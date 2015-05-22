@@ -8,25 +8,25 @@ module Feedback::Admin
     helper_method :sort_column
 
     def index
-      @groups = current_site.groups
+      @groups = Feedback::Group.where(site_id: current_site.id)
         .order(sort_column + ' ' + sort_direction)
         .page(params[:page]).per(params[:per_page])
     end
 
     def show
-      @group = current_site.groups.find(params[:id])
+      @group = Feedback::Group.find(params[:id])
     end
 
     def new
-      @group = current_site.groups.new
+      @group = Feedback::Group.new
     end
 
     def edit
-      @group = current_site.groups.find(params[:id])
+      @group = Feedback::Group.find(params[:id])
     end
 
     def create
-      @group = current_site.groups.new(group_params)
+      @group = Feedback::Group.new(group_params)
 
       if @group.save
         redirect_to({ site_id: @group.site.name, controller: 'groups' },
@@ -37,7 +37,7 @@ module Feedback::Admin
     end
 
     def update
-      @group = current_site.groups.find(params[:id])
+      @group = Feedback::Group.find(params[:id])
       if @group.update(group_params)
         redirect_to({ site_id: @group.site.name, controller: 'groups', action: 'index' },
                     flash: { success: t('successfully_updated') })
@@ -47,7 +47,7 @@ module Feedback::Admin
     end
 
     def destroy
-      @group = current_site.groups.find(params[:id])
+      @group = Feedback::Group.find(params[:id])
       @group.destroy
 
       redirect_to(admin_groups_url)
@@ -60,7 +60,7 @@ module Feedback::Admin
     end
 
     def group_params
-      params.require(:group).permit(:name, :emails)
+      params.require(:group).permit(:name, :emails, :site_id)
     end
   end
 end

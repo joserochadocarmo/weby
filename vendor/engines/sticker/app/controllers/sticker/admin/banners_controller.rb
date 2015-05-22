@@ -14,26 +14,26 @@ module Sticker::Admin
 
     def index
       sort = sort_column == 'id' ?  ' ' : (sort_column + ' ' + sort_direction + ', ')
-      @banners = current_site.banners
+      @banners = Sticker::Banner.where(site_id: current_site)
         .order(sort + 'position ASC')
         .titles_or_texts_like(params[:search])
         .page(params[:page]).per(params[:per_page])
     end
 
     def show
-      @banner = current_site.banners.find(params[:id])
+      @banner = Sticker::Banner.where(site_id: current_site).find(params[:id])
     end
 
     def new
-      @banner = current_site.banners.new
+      @banner = Sticker::Banner.where(site_id: current_site).new
     end
 
     def edit
-      @banner = current_site.banners.find(params[:id])
+      @banner = Sticker::Banner.where(site_id: current_site).find(params[:id])
     end
 
     def create
-      @banner = current_site.banners.new(banner_params)
+      @banner = Sticker::Banner.where(site_id: current_site).new(banner_params)
       @banner.user_id = current_user.id
       if params[:submit_search]
         search_images
@@ -45,7 +45,7 @@ module Sticker::Admin
     end
 
     def update
-      @banner = current_site.banners.find(params[:id])
+      @banner = Sticker::Banner.where(site_id: current_site).find(params[:id])
       if params[:submit_search]
         @banner.attributes = params[:banner]
         search_images
@@ -58,14 +58,14 @@ module Sticker::Admin
 
     # Shows only the published Banners
     def fronts
-      @banners = current_site.banners.where(publish: true)
+      @banners = Sticker::Banner.where(site_id: current_site, publish: true)
         .order('position desc')
         .titles_or_texts_like(params[:search])
         .page(params[:page]).per(params[:per_page])
     end
 
     def destroy
-      @banner = current_site.banners.find(params[:id])
+      @banner = Sticker::Banner.where(site_id: current_site).find(params[:id])
       if @banner.destroy
         record_activity('destroyed_banner', @banner)
         flash[:success] = t('destroyed_param', param: @banner.title)

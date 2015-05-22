@@ -21,7 +21,7 @@
 
   <%= f.input t(".category"), wrapper: :append do %>
     <%= f.select :category_list,
-      current_site.banners.category_counts, {},
+      Sticker::Banner.where(site_id: current_site).category_counts, {},
       :id => "category", class: 'form-control' %>
     <span class="input-group-btn">
       <%= link_to t(".add_category"), '#', onclick: "addToSelect('#category','#{t(".new_category")}')", :class => 'btn btn-info' %>
@@ -31,7 +31,7 @@
   <%= f.input :position, hint: t(".lower_numbers_come_first") %>
 
   <div class='input'>
-    <%= f.input :publish, wrapper: :checkbox,
+    <%= f.input :publish,
       wrapper_html: { class: "side" },
       as: :boolean, input_html: { class: "check-button" } %>
     <div class="clear"></div>
@@ -52,7 +52,7 @@
   <% end %>
 
   <div class='input'>
-    <%= f.input :new_tab, wrapper: :checkbox,
+    <%= f.input :new_tab,
       wrapper_html: { class: "side" },
       as: :boolean, input_html: { class: "check-button" } %>
     <div class="clear"></div>

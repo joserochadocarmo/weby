@@ -410,6 +410,5 @@ module Import
     CONVAR ||= {} # conversion variable, to translate de old repository_id to a new
     CONVAR["repository"] = {}
     CONVAR["menu"] = {}
-    CONVAR["news"] = {}
   end
 end

@@ -7,26 +7,31 @@ module Journal
 
     STATUS_LIST = %w(draft review published)
 
+    acts_as_taggable_on :categories
+    acts_as_multisite
 
     belongs_to :site
     belongs_to :user
-
+    
     has_many :views, as: :viewable
     has_many :menu_items, as: :target, dependent: :nullify
     has_many :posts_repositories, as: :post, dependent: :destroy
     has_many :related_files, through: :posts_repositories, source: :repository
-    has_many :news_sites, foreign_key: :journal_news_id, class_name: "::Journal::NewsSite", dependent: :destroy
-    has_many :sites, :through => :news_sites, class_name: "::Journal::NewsSite"
 
     # Validations
     validates :user_id, :site_id, :status, presence: true
-
+    
     validate :validate_date
 
     scope :published, -> { where(status: 'published') }
     scope :review, -> { where(status: 'review') }
     scope :draft, -> { where(status: 'draft') }
+    scope :front, -> { where(front: true) }
+    scope :no_front, -> { where(front: false) }
     scope :by_user, ->(id) { where(user_id: id) }
+
+    scope :available, -> { where('date_begin_at is NULL OR date_begin_at <= :time', time: Time.now).published }
+    scope :available_fronts, -> { front.available.where('date_end_at is NULL OR date_end_at > :time', time: Time.now) }
 
     # tipos de busca
     # 0 = "termo1 termo2"
@@ -35,7 +40,7 @@ module Journal
     scope :search, ->(param, search_type) {
       if param.present?
         fields = ['journal_news_i18ns.title', 'journal_news_i18ns.summary', 'journal_news_i18ns.text',
-                  'users.first_name']
+                  'users.first_name', 'tags.name']
         query, values = '', {}
         case search_type
         when 0
@@ -52,9 +57,9 @@ module Journal
             })"
           end.join(' OR ')
         end
-        includes(:user, :i18ns, :locales)
+        includes(:user, :categories, :i18ns, :locales)
         .where(query, values)
-        .references(:user, :i18ns)
+        .references(:user, :categories, :i18ns)
       end
     }
 
@@ -69,31 +74,23 @@ module Journal
 
     def self.import(attrs, options = {})
       return attrs.each { |attr| import attr, options } if attrs.is_a? Array
-
+      
       attrs = attrs.dup
       attrs = attrs['news'] if attrs.key? 'news'
-      id = attrs['id']
-      attrs.except!('id', '@type', 'type', 'created_at', 'updated_at', 'site_id')
+
+      attrs.except!('id', 'type', 'created_at', 'updated_at', 'site_id')
 
       attrs['user_id'] = options[:user] unless User.unscoped.find_by(id: attrs['user_id'])
-      repo_id = Import::Application::CONVAR["repository"]["#{attrs['repository_id']}"]
-      repo = Repository.find(repo_id) if !repo_id.blank?
-      attrs.except!('repository_id')
-      if repo && repo.archive_content_type
-        repo.image? ? attrs['repository_id'] = repo_id : attrs.except!('repository_id')
-      end
-
+      attrs['repository_id'] = Import::Application::CONVAR["repository"]["#{attrs['repository_id']}"]
+      
       attrs['i18ns'] = attrs['i18ns'].map do |i18n|
         i18n['text'] = i18n['text'].gsub(/\/up\/[0-9]+/) {|x| "/up/#{options[:site_id]}"} if i18n['text']
-        self::I18ns.new(i18n.except('id', '@type', 'type', 'created_at', 'updated_at', 'journal_news_id'))
+        self::I18ns.new(i18n.except('id', 'type', 'created_at', 'updated_at', 'journal_news_id'))
       end
-
+      attrs['category_list'] = attrs.delete('categories').to_a.map { |category| category['name'] }
       attrs['related_file_ids'] = attrs.delete('related_files').to_a.map {|repo| Import::Application::CONVAR["repository"]["#{repo['id']}"] }
 
-      news = self.create!(attrs)
-      if news.persisted?
-        Import::Application::CONVAR["news"]["#{id}"] ||= "#{news.id}"
-      end
+      self.create!(attrs)
     end
 
     def to_param
@@ -104,6 +101,18 @@ module Journal
       status == 'published'
     end
 
+    def self.uniq_category_counts
+      category_counts.each_with_object(Hash.new) do |j, hash|
+        name = j.name.upcase
+        if hash[name]
+          hash[name].count += j.count
+        else
+          hash[name] = j
+        end
+        hash
+      end.values
+    end
+
     def link
       if url.blank?
         news_url(self, subdomain: self.site)
@@ -111,8 +120,6 @@ module Journal
         url
       end
     end
-
-    accepts_nested_attributes_for :news_sites, allow_destroy: true
 
     private
 

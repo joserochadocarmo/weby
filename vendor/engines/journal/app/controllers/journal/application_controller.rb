@@ -1,19 +1,15 @@
 module Journal
   class ApplicationController < ::ApplicationController
     def sort
-#      Journal::News.includes(:sites, :user, :image)
-#      .where('journal_news.site_id = :site OR journal_news_sites.site_id = :site', site: site.id).available_fronts
-#      .order("#{order_by} #{direction}").page(page_param).per(quant)
-
-      @ch_pos = Journal::NewsSite.where(site_id: current_site.id).front.where(journal_news_id: params[:id_moved]).first
+      @ch_pos = Journal::News.where(site_id: current_site.id).find(params[:id_moved])
       increment = 1
       # In case it was moved to the end of the list or the end of a page (when paginated)
       if (params[:id_after] == '0')
-        @before = Journal::NewsSite.where(site_id: current_site.id).where(journal_news_id: params[:id_before]).first
+        @before = Journal::News.where(site_id: current_site.id).find(params[:id_before])
         condition = "position < #{@ch_pos.position} AND position >= #{@before.position}"
         new_pos = @before.position
       else
-        @after = Journal::NewsSite.where(site_id: current_site.id).where(journal_news_id: params[:id_after]).first
+        @after = Journal::News.where(site_id: current_site.id).find(params[:id_after])
         # In case it was moved from top to bottom
         if @ch_pos.position > @after.position
           condition = "position < #{@ch_pos.position} AND position > #{@after.position}"
@@ -25,7 +21,7 @@ module Journal
           new_pos = @after.position
         end
       end
-      Journal::NewsSite.where(site_id: current_site.id).front.where(condition).update_all("position = position + (#{increment})")
+      Journal::News.where(site_id: current_site.id).front.where(condition).update_all("position = position + (#{increment})")
       @ch_pos.update_attribute(:position, new_pos)
       render nothing: true
     end

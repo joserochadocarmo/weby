@@ -13,7 +13,8 @@ class EventListComponent < Component
 
   def events(site, page_param)
     direction = 'desc'
-    site.events.includes(:image).upcoming.order('begin_at asc, id asc').page(page_param).per(quant)
+    events = Calendar::Event.where(site_id: site.id).includes(:image).upcoming
+      .order("begin_at asc, id asc").page(page_param).per(quant)
   end
   private :events
 

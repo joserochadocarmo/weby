@@ -17,6 +17,7 @@
       <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
       <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
+
   </head>
   <body>
     <div class="zone">
@@ -75,8 +76,13 @@
           <% unless flash.empty? %>
             <%= raw flash_message %>
           <% end %>
+
+          <!-- remover -->
+          <%= params[:show_locale] %>
+
           <div class="well">
             <%= breadcrumbs style: :bootstrap %>
+
             <%= yield %>
           </div>
         </div>
@@ -95,5 +101,7 @@
     <%= yield :body_end %>
     <%= javascript_include_tag "application" %>
     <%= yield :javascripts %>
+    <% content_for :javascripts, javascript_include_tag("responsive-images") %>
+
   </body>
 </html>

@@ -1,4 +1,4 @@
-<%= simple_form_for [:admin, @site] do |f| %>
+<%= simple_form_for [:admin, @site], html: { class: 'form-horizontal' } do |f| %>
   <%= f.show_errors %>
 
   <%= f.input :name, :hint => t("field_required"), :input_html => {:pattern => '^[a-z0-9_\-]+$'}  %>
@@ -6,16 +6,16 @@
   <%= f.input :url, :hint =>  (t("field_required") + " " + t(".example_url")), :placeholder => "http://"%>
   <%= f.association :groupings, input_html: {class: 'select2 site-groupings'} %>
   <%= f.input :domain, :hint => t(".domain_explain") %>
-
+  
   <%= f.input :title, :input_html => {:maxlength => 50} %>
   <%= f.input :description, :input_html => {:rows => 8}, :hint => t(".site_comments"), :as => :text %>
-  <%= f.input :view_desc_pages, :hint => t(".view_desc_pages_help"), :as => :boolean, wrapper: :checkbox %>
+  <%= f.input :view_desc_pages, :hint => t(".view_desc_pages_help"), :as => :boolean %>
 
   <%= f.input :theme, :collection => @themes.collect{|name| [t("themes.#{name}.title"), name]} %>
   <%= f.input :body_width, :hint => t(".example_width") %>
   <%= f.input :per_page,  :hint => t(".example_per_page") %>
   <%= f.input :per_page_default,  :required => true %>
-
+  
   <%= f.association :locales,
     :as => :check_boxes,
     :boolean_style => :nested,

@@ -33,7 +33,7 @@ module Feedback
     private
 
     def get_groups
-      @groups = current_site.groups
+      @groups = Feedback::Group.where(site_id: current_site.id)
     end
 
     def message_params

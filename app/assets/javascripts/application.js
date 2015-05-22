@@ -10,6 +10,8 @@
 //= require moment
 //= require daterangepicker
 //= require_self
+//= require srcset.min
+
 
 var WEBY = {};
 

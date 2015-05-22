@@ -23,6 +23,7 @@
     <%= yield :components_stylesheets %>
     <%= render 'sites/shared/loadStyles' %>
     <%= current_site.try(:head_html).try(:html_safe) %>
+    <%= javascript_include_tag "srcset.min", :async => true %>
   </head>
 
   <body>

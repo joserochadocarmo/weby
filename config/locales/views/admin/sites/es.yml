@@ -18,7 +18,6 @@ es:
         title:                  " Titulo "
         settings:               " Configuración "
         no-site-found:          " No hay sitios."
-        delete:                 " Excluir "
       form:
         example_width:          " Ejemplo "
         example_url:            " Ejemplo: http://site.com "

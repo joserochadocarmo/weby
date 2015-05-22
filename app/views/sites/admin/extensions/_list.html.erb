@@ -15,7 +15,7 @@
         <% raw_extension = Weby::extensions[extension.name.to_sym] %>
         <tr>
           <td>
-              <%= link_to t("extensions.#{extension.name}.name"), "/admin/#{extension.name}" %>
+              <%= link_to t("extensions.#{extension.name}.name"), "/#{extension.name}/admin" %>
             </td>
           <td>
             <%= raw_extension.version %>

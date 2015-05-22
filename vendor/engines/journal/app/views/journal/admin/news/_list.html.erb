@@ -26,20 +26,14 @@
         <% @newslist.each do |news| %>
         <tr id="<%= news.id %>"<%= ' class="deactivated"'.html_safe unless news.published? %>>
           <td>
-            <% if news.site_id == current_site.id %>
             <%= link_to news.title, admin_news_path(news) %>
-            <% else %>
-            <%= icon('retweet') %>
-            <%= link_to news.title, news_url(news, subdomain: news.site) %>
-            <% end %>
           </td>
           <td><%= news.user.first_name %></td>
-          <% @news_site = news.news_sites.find_by(site_id: current_site.id) %>
-          <td><%= raw categories_links(@news_site.category_list) %></td>
+          <td><%= raw categories_links(news.category_list) %></td>
           <td><%= l(news.created_at, :format => :short) %></td>
           <% with_permission(action: :edit) do %>
             <td class="front" style="text-align:center;">
-              <%= front_status(@news_site) %></td>
+              <%= front_status(news) %></td>
             <td class="publish">
               <%= news_status(news) %></td>
           <% end %>

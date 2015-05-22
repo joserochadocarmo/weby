@@ -1,7 +1,7 @@
 <% title ".pages" %>
 <% breadcrumb :pages_show, @page %>
 <article class="page-show">
-  
+
   <header>
     <%= raw available_flags(@page) if @page.locales.many? %>
     <h1><%= @page.title %></h1>
@@ -10,8 +10,9 @@
   <p>
     <%= "#{@page.user} #{l(@page.created_at, format: :short)}" if @site.view_desc_pages %>
   </p>
-  
+
   <div class="body">
+
     <%= raw @page.text %>
   </div>
 

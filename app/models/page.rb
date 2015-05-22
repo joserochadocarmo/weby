@@ -8,7 +8,7 @@ class Page < ActiveRecord::Base
   belongs_to :site
   belongs_to :user
 
-  has_many :views, as: :viewable, dependent: :delete_all
+  has_many :views, as: :viewable
   has_many :menu_items, as: :target, dependent: :nullify
   has_many :posts_repositories, as: :post, dependent: :destroy
   has_many :related_files, through: :posts_repositories, source: :repository
@@ -56,13 +56,13 @@ class Page < ActiveRecord::Base
     attrs = attrs.dup
     attrs = attrs['page'] if attrs.key? 'page'
 
-    attrs.except!('id', 'created_at', 'updated_at', 'site_id', '@type')
+    attrs.except!('id', 'created_at', 'updated_at', 'site_id')
 
     attrs['user_id'] = options[:user] unless User.unscoped.find_by(id: attrs['user_id'])
-
+    
     attrs['i18ns'] = attrs['i18ns'].map do |i18n|
       i18n['text'] = i18n['text'].gsub(/\/up\/[0-9]+/) {|x| "/up/#{options[:site_id]}"} if i18n['text']
-      self::I18ns.new(i18n.except('id', 'type', '@type', 'created_at', 'updated_at', 'page_id'))
+      self::I18ns.new(i18n.except('id', 'type', 'created_at', 'updated_at', 'page_id'))
     end
     attrs['related_file_ids'] = attrs.delete('related_files').to_a.map {|repo| Import::Application::CONVAR["repository"]["#{repo['id']}"] }
 
