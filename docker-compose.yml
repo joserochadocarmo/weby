@@ -1,0 +1,28 @@
+version: "3"
+services:
+    weby:
+        container_name: weby
+        build: .
+        image: joserocha/weby
+        volumes:
+            - /weby
+        environment:
+            RAILS_ENV: production
+            PORT: 3000
+            SECRET_KEY_BASE: 34kja87ds89923nmads0978967q43kln
+            PG_DB: weby
+            PG_USER: postgres
+            PG_PASS: postgres
+            PG_HOST: 172.17.0.2
+            PG_PORT: 5432
+        ports:
+            - "3000:3000"
+        restart: always
+        stdin_open: true
+        command: "bundle exec rails s -p 3000 -b '0.0.0.0'"
+        tty: true
+
+#docker-compose build --no-cache  ou #Criar a imagem: docker build -t weby .
+#Criar container: docker-compose up -d
+#Entrar no container docker exec -it weby bash
+#docker run --name postgresql -itd --restart always --publish 5432:5432 --env 'PG_TRUST_LOCALNET=true' --env 'DB_USER=posgres' --env 'DB_PASS=postgres' sameersbn/postgresql
